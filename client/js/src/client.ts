@@ -759,11 +759,9 @@ export function api_factory(
 						} else if (
 							protocol == "sse_v1" ||
 							protocol == "sse_v2" ||
-							protocol == "sse_v2.1" ||
-							protocol == "sse_v3"
+							protocol == "sse_v2.1"
 						) {
 							// latest API format. v2 introduces sending diffs for intermediate outputs in generative functions, which makes payloads lighter.
-							// v3 only closes the stream when the backend sends the close stream message.
 							fire_event({
 								type: "status",
 								stage: "pending",
@@ -858,7 +856,7 @@ export function api_factory(
 												});
 												if (
 													data &&
-													["sse_v2", "sse_v2.1", "sse_v3"].includes(protocol)
+													(protocol === "sse_v2" || protocol === "sse_v2.1")
 												) {
 													apply_diff_stream(event_id!, data);
 												}
@@ -907,9 +905,7 @@ export function api_factory(
 												fn_index,
 												time: new Date()
 											});
-											if (["sse_v2", "sse_v2.1"].includes(protocol)) {
-												close_stream();
-											}
+											close_stream();
 										}
 									};
 									if (event_id in pending_stream_messages) {
@@ -1053,10 +1049,7 @@ export function api_factory(
 							)
 						);
 					} else if (event_callbacks[event_id]) {
-						if (
-							_data.msg === "process_completed" &&
-							["sse", "sse_v1", "sse_v2", "sse_v2.1"].includes(config.protocol)
-						) {
+						if (_data.msg === "process_completed") {
 							unclosed_events.delete(event_id);
 							if (unclosed_events.size === 0) {
 								close_stream();
@@ -1069,9 +1062,6 @@ export function api_factory(
 							pending_stream_messages[event_id] = [];
 						}
 						pending_stream_messages[event_id].push(_data);
-					}
-					if (_data.msg === "close_stream") {
-						close_stream();
 					}
 				};
 				event_stream.onerror = async function (event) {

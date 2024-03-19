@@ -79,7 +79,6 @@ from gradio.route_utils import (  # noqa: F401
     move_uploaded_files_to_cache,
 )
 from gradio.server_messages import (
-    CloseStreamMessage,
     EstimationMessage,
     EventMessage,
     HeartbeatMessage,
@@ -793,10 +792,6 @@ class App(FastAPI):
                                         == 0
                                     )
                                 ):
-                                    message = CloseStreamMessage()
-                                    response = process_msg(message)
-                                    if response is not None:
-                                        yield response
                                     return
                 except BaseException as e:
                     message = UnexpectedErrorMessage(
