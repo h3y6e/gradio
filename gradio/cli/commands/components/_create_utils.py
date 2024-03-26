@@ -199,6 +199,10 @@ OVERRIDES = {
         """
         ),
     ),
+    "ImageEditor": ComponentFiles(
+        template="ImageEditor",
+        python_file_name="image_editor.py",
+    ),
 }
 
 
